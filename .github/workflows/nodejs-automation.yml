@@ -47,6 +47,5 @@ jobs:
             cd /tmp
             sudo yum update
             sudo yum install -y nodejs
-            ps aux  |  grep -i "/usr/bin/node src/index.js"  |  awk '{print $2}'  |  xargs sudo kill -9
             sudo npm start &
 
