@@ -15,11 +15,13 @@ Pwd
 check the user- ec2-user  
 
 
+
 ls -la (make sure the .ssh is there)  
 
 ssh-keygen (for generating the public and private keys) (id_rsa, id_rsa.pub)  
 
 cd .ssh  
+
 
 Copy the private key (id_rsa) to github secrets.  
 
