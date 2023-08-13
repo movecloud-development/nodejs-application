@@ -47,5 +47,5 @@ jobs:
             cd /tmp
             sudo yum update
             sudo yum install -y nodejs
-            sudo npm start &
+            sudo nohup npm start &
 
