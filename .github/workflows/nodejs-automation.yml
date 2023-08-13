@@ -45,5 +45,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /tmp
-            npm start
+            sudo yum update
+            sudo yum install -y nodejs
+            sudo npm start
 
