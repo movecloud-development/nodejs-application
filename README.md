@@ -37,4 +37,18 @@ cat id_rsa.pub >> authorized_keys
 
 Now run the workflow.  
 
+command for build and run the docker image 
+
+docker build -t <image_name> .
+
+docker run -p 3001:3001 -it <image_name or image_id>
+
+to get the list of running containers
+
+
+docker ps -la 
+
+to get the list of created images
+
+docker images
 
