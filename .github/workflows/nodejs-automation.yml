@@ -46,9 +46,7 @@ jobs:
           script: |
             cd /home/ec2-user
             sudo yum update
-          #  sudo yum install -y nodejs
             sudo yum install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
             sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
-          #  sudo nohup npm start > app.log 2>&1 &
             npm start > app.log 2>&1 &
 
