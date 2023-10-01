@@ -1,0 +1,76 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - docker-automation
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: 'movecloud-development/nodejs-application'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16  # Replace with the Node.js version you need
+
+      - name: Build Docker Image
+        run: |
+          docker build -t nodejs-shoppingcart-app .
+        working-directory: ${{ github.workspace }}
+
+      - name: Authenticate with AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Save Docker Image as Tarball
+        run: |
+          docker save -o nodejs-shoppingcart-app.tar nodejs-shoppingcart-app
+        working-directory: ${{ github.workspace }}
+
+      - name: Push Docker Image Tarball to S3
+        run: |
+          aws s3 cp nodejs-shoppingcart-app.tar s3://terraformlab-1/nodejs-shoppingcart-app.tar
+        env:
+          S3_BUCKET: terraformlab-1
+
+
+      - name: Copy Docker Image Tarball to EC2 Instance (via SSH)
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # Replace with your EC2 instance public IP or hostname
+          username: ${{ secrets.EC2_USERNAME }}  # Replace with your EC2 instance username
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}  # Replace with your EC2 instance SSH private key (base64-encoded)
+          source: "${{ github.workspace }}/nodejs-shoppingcart-app.tar"
+          target: "/home/ec2-user/"
+          debug: "true"
+
+
+      - name: Load Docker Image from Tarball and Run (via SSH)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # Replace with your EC2 instance public IP or hostname
+          username: ${{ secrets.EC2_USERNAME }}  # Replace with your EC2 instance username
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}  # Replace with your EC2 instance SSH private key (base64-encoded)
+          port: 22
+          script: |
+            sudo yum update -y
+            sudo yum install docker -y
+            sudo service docker start
+            sudo usermod -a -G docker ec2-user
+            cd /home/ec2-user/github/workspace/
+            sudo docker stop nodejs-shoppingcart-app || true
+            sudo docker rm nodejs-shoppingcart-app || true
+            sudo docker load -i nodejs-shoppingcart-app.tar
+            sudo docker run -d --name nodejs-shoppingcart-app -p 3001:3001 nodejs-shoppingcart-app
+
+
