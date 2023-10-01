@@ -33,7 +33,7 @@ jobs:
           # source: "target/*.jar"
           source: "*"
           # source: "/home/runner/work/spring-petclinic/spring-petclinic/file1.txt"
-          target: "/tmp"  # Replace with the target path on the EC2 instance
+          target: "/home/ec2-user"  # Replace with the target path on the EC2 instance
           # target: "/home"
           debug: "true"
 
@@ -44,7 +44,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            cd /tmp
+            cd /home/ec2-user
             sudo yum update
             sudo yum install -y nodejs
             nohup npm start > app.log 2>&1 &
