@@ -52,3 +52,6 @@ to get the list of created images
 
 docker images
 
+Access the shopping cart website 
+
+http://ec2-52-23-180-219.compute-1.amazonaws.com:3001/buckets
